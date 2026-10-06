@@ -1,13 +1,17 @@
-import { sampleChips } from '../data'
-import { Icon } from './Icon'
+import { sampleChips } from '../services/mockData'
+import { Icon } from '../../../shared/components/Icon'
 
 interface Props {
+  /** True while the API request is in flight. */
+  loading: boolean
+  /** Validation / API error message, if any. */
+  error: string | null
   value: string
   onChange: (value: string) => void
   onTrack: () => void
 }
 
-export function SearchHero({ value, onChange, onTrack }: Props) {
+export function SearchHero({ value, onChange, onTrack, loading, error }: Props) {
   const paste = async () => {
     try {
       const text = await navigator.clipboard.readText()
@@ -53,6 +57,8 @@ export function SearchHero({ value, onChange, onTrack }: Props) {
               <Icon name="travel_explore" className="text-primary text-2xl mr-3 select-none" />
               <input
                 id="trackingInput"
+                aria-label="Tracking Number"
+                aria-invalid={error ? true : undefined}
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
@@ -89,13 +95,21 @@ export function SearchHero({ value, onChange, onTrack }: Props) {
               <button
                 type="button"
                 onClick={onTrack}
-                className="relative flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-headline font-semibold text-sm transition-all duration-300 shadow-[0_0_20px_rgba(255,45,120,0.45)] hover:shadow-[0_0_25px_rgba(255,45,120,0.7)] active:scale-[0.98]"
+                disabled={loading}
+                className="relative flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-headline font-semibold text-sm transition-all duration-300 shadow-[0_0_20px_rgba(255,45,120,0.45)] hover:shadow-[0_0_25px_rgba(255,45,120,0.7)] active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
               >
-                <Icon name="radar" className="text-lg" />
+                <Icon name={loading ? "progress_activity" : "radar"} className={`text-lg ${loading ? "animate-spin" : ""}`} />
                 <span>ตรวจหาและติดตามพัสดุ</span>
               </button>
             </div>
           </div>
+
+          {error && (
+            <div role="alert" className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-error-container text-error text-sm font-label">
+              <Icon name="error" className="text-lg" />
+              <span>{error}</span>
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
             <span className="font-label text-on-surface-variant flex items-center gap-1 mr-1">

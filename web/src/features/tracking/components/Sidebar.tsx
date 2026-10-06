@@ -1,4 +1,4 @@
-import { Icon } from './Icon'
+import { Icon } from '../../../shared/components/Icon'
 
 const MAP =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCFebUtYLcl1B0upvKb_ZdCf7lL_JGkq_3_x5eTMCTaTdDzphvwrZuEqjulL5F2IeuyZ58f7Mb7aMCzVhxupzzHH-IE_WGxaTOgtMQO_PNY3ZGeUtUwyDlNr2F91wjLrVuI0opZSAbpUiKU05g0OwGmAwjZt36571lCKOk9MzO-Qu23W6HsrcgigKhD6g7-MM7gHxi31yJgGhX1RGRGFPDHlkVzU7oxFMz5J35STTkf28MOyvqzX10'

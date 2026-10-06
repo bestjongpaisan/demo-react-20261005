@@ -1,5 +1,6 @@
-import { history, type HistoryRow } from '../data'
-import { Icon } from './Icon'
+import type { HistoryRow } from '../types'
+import { history } from '../services/mockData'
+import { Icon } from '../../../shared/components/Icon'
 
 function StatusBadge({ status }: { status: HistoryRow['status'] }) {
   if (status === 'transit') {
@@ -29,7 +30,7 @@ function StatusBadge({ status }: { status: HistoryRow['status'] }) {
 const toolButton =
   'px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-xs font-label text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1'
 
-export function HistoryTable({ activeTracking, onSelect }: { activeTracking: string; onSelect: (tracking: string) => void }) {
+export function HistoryTable({ activeTracking, onSelect }: { activeTracking?: string; onSelect: (tracking: string) => void }) {
   return (
     <section className="bg-surface-container rounded-2xl p-6 sm:p-7 shadow-xl flex flex-col gap-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

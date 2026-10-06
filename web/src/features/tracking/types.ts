@@ -1,12 +1,12 @@
 // Domain types for the tracking feature.
 export type CourierId = 'flash' | 'thp' | 'kex'
 
+/** Courier display config used by the match matrix. */
 export interface Courier {
   id: CourierId
   short: string
   name: string
   rule: string
-  pattern: RegExp
   matchScore: number
   missScore: number
   missNote: string
@@ -19,7 +19,24 @@ export interface TimelineStep {
   time: string
   desc: string
   state: 'pending' | 'active' | 'done'
-  circle: string
+}
+
+export interface Party {
+  name: string
+  address: string
+}
+
+/** Payload of `data` in a 200 response from POST /api/tracking. */
+export interface TrackingData {
+  trackingCode: string
+  courierId: CourierId
+  courierName: string
+  description: string
+  weightKg: number
+  eta: string
+  sender: Party
+  receiver: Party
+  timeline: TimelineStep[]
 }
 
 export interface HistoryRow {
@@ -33,3 +50,5 @@ export interface HistoryRow {
   status: 'transit' | 'delivered' | 'pending'
   action: string
 }
+
+export type SearchStatus = 'idle' | 'loading' | 'success' | 'error'

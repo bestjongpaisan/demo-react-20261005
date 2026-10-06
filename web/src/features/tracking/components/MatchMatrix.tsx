@@ -1,5 +1,6 @@
-import { couriers, type Courier } from '../data'
-import { Icon } from './Icon'
+import type { Courier } from '../types'
+import { couriers } from '../services/mockData'
+import { Icon } from '../../../shared/components/Icon'
 
 function CourierCard({ courier, matched }: { courier: Courier; matched: boolean }) {
   const score = matched ? courier.matchScore : courier.missScore
@@ -82,7 +83,8 @@ function CourierCard({ courier, matched }: { courier: Courier; matched: boolean 
   )
 }
 
-export function MatchMatrix({ matched }: { matched?: Courier }) {
+export function MatchMatrix({ matchedId }: { matchedId?: Courier['id'] }) {
+  const matched = couriers.find((c) => c.id === matchedId)
   return (
     <section className="flex flex-col gap-4">
       <div className="w-full bg-surface-container-low rounded-xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg">

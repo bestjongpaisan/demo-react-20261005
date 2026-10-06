@@ -1,7 +1,22 @@
-import { timeline } from '../data'
-import { Icon } from './Icon'
+import type { TrackingData } from '../types'
+import { Icon } from '../../../shared/components/Icon'
 
-export function ShipmentCard({ tracking, courierName }: { tracking: string; courierName: string }) {
+// Circle styling per timeline state; completed steps fade towards the origin.
+const DONE_CIRCLES = [
+  'bg-secondary text-on-secondary shadow-[0_0_10px_rgba(0,255,204,0.5)]',
+  'bg-secondary/80 text-on-secondary',
+  'bg-secondary/60 text-on-secondary',
+]
+
+export function ShipmentCard({ data }: { data: TrackingData }) {
+  const { timeline } = data
+  let doneIndex = 0
+  const circleFor = (state: TrackingData['timeline'][number]['state']) => {
+    if (state === 'pending') return 'bg-surface-container-high text-outline-variant'
+    if (state === 'active') return 'bg-primary text-on-primary shadow-[0_0_15px_rgba(255,45,120,0.8)]'
+    return DONE_CIRCLES[Math.min(doneIndex++, DONE_CIRCLES.length - 1)]
+  }
+
   return (
     <div className="bg-surface-container rounded-2xl p-6 sm:p-7 shadow-xl flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 gap-4 bg-surface-container-low/50 p-4 rounded-xl">
@@ -11,21 +26,21 @@ export function ShipmentCard({ tracking, courierName }: { tracking: string; cour
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-headline font-bold text-lg text-on-surface tracking-wider">{tracking}</span>
+              <span className="font-headline font-bold text-lg text-on-surface tracking-wider">{data.trackingCode}</span>
               <span className="px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-label text-[10px] uppercase font-bold tracking-wider">
-                {courierName}
+                {data.courierName}
               </span>
             </div>
             <div className="flex items-center gap-3 text-xs text-on-surface-variant font-body mt-0.5">
-              <span>พัสดุด่วน Gadget อิเล็กทรอนิกส์</span>
+              <span>{data.description}</span>
               <span>•</span>
-              <span className="font-label">น้ำหนัก: 1.45 kg</span>
+              <span className="font-label">น้ำหนัก: {data.weightKg} kg</span>
             </div>
           </div>
         </div>
         <div className="flex flex-col sm:text-right">
           <span className="font-label text-xs text-on-surface-variant uppercase">กำหนดส่งโดยประมาณ</span>
-          <span className="font-headline font-bold text-base sm:text-lg text-tertiary">วันนี้ ภายใน 16:30 น.</span>
+          <span className="font-headline font-bold text-base sm:text-lg text-tertiary">{data.eta}</span>
         </div>
       </div>
 
@@ -34,16 +49,16 @@ export function ShipmentCard({ tracking, courierName }: { tracking: string; cour
           <Icon name="trip_origin" className="text-secondary text-lg mt-0.5" />
           <div className="flex flex-col text-xs">
             <span className="font-label text-on-surface-variant uppercase tracking-wider text-[10px]">ผู้ส่งต้นทาง (Sender Hub)</span>
-            <span className="font-headline font-semibold text-on-surface mt-0.5">CyberHub BKK (พระราม 9)</span>
-            <span className="text-on-surface-variant text-[11px]">กรุงเทพมหานคร 10310</span>
+            <span className="font-headline font-semibold text-on-surface mt-0.5">{data.sender.name}</span>
+            <span className="text-on-surface-variant text-[11px]">{data.sender.address}</span>
           </div>
         </div>
         <div className="p-3.5 rounded-lg bg-surface-container-low flex items-start gap-3">
           <Icon name="location_on" className="text-primary text-lg mt-0.5" />
           <div className="flex flex-col text-xs">
             <span className="font-label text-on-surface-variant uppercase tracking-wider text-[10px]">ผู้รับปลายทาง (Destination)</span>
-            <span className="font-headline font-semibold text-on-surface mt-0.5">คุณอมรา (Logistics Lead)</span>
-            <span className="text-on-surface-variant text-[11px]">แขวงจอมพล เขตจตุจักร ลาดพร้าว กทม. 10900</span>
+            <span className="font-headline font-semibold text-on-surface mt-0.5">{data.receiver.name}</span>
+            <span className="text-on-surface-variant text-[11px]">{data.receiver.address}</span>
           </div>
         </div>
       </div>
@@ -75,7 +90,7 @@ export function ShipmentCard({ tracking, courierName }: { tracking: string; cour
         <div className="relative flex flex-col gap-6 pl-4 sm:pl-6 before:content-[''] before:absolute before:left-[19px] sm:before:left-[27px] before:top-3 before:bottom-3 before:w-0.5 before:bg-outline-variant">
           {timeline.map((step) => (
             <div key={step.title} className={`relative flex items-start gap-4 ${step.state === 'pending' ? 'opacity-50' : ''}`}>
-              <div className={`relative z-10 w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full flex items-center justify-center text-sm ${step.circle}`}>
+              <div className={`relative z-10 w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full flex items-center justify-center text-sm ${circleFor(step.state)}`}>
                 <Icon name={step.icon} className="text-base" />
               </div>
               {step.state === 'active' ? (

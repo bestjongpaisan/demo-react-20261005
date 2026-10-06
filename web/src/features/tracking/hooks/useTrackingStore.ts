@@ -1,26 +1,50 @@
 import { create } from 'zustand'
-
-export const DEFAULT_TRACKING = 'TH2409857129EX'
+import { fetchTracking } from '../services/trackingApi'
+import { validateTrackingCode } from '../services/validation'
+import type { SearchStatus, TrackingData } from '../types'
 
 interface TrackingState {
   /** Raw text currently typed in the search box. */
   input: string
-  /** Normalised tracking number that was last submitted. */
-  tracked: string
+  status: SearchStatus
+  /** Message shown when validation or the API fails. */
+  error: string | null
+  /** Data returned by the API for the last successful search. */
+  data: TrackingData | null
   setInput: (value: string) => void
-  /** Submit the current input; ignores blank input. */
-  track: () => void
-  /** Jump straight to a tracking number (e.g. from the history table). */
-  select: (tracking: string) => void
+  /** Validate the input, then call the API (flow 1, steps 3-6). */
+  search: () => Promise<void>
+  /** Fill the input with a code and search it immediately. */
+  select: (trackingCode: string) => Promise<void>
+}
+
+export const initialTrackingState: Pick<TrackingState, 'input' | 'status' | 'error' | 'data'> = {
+  input: '',
+  status: 'idle',
+  error: null,
+  data: null,
 }
 
 export const useTrackingStore = create<TrackingState>((set, get) => ({
-  input: DEFAULT_TRACKING,
-  tracked: DEFAULT_TRACKING,
+  ...initialTrackingState,
   setInput: (input) => set({ input }),
-  track: () => {
-    const value = get().input.trim()
-    if (value) set({ tracked: value.toUpperCase() })
+  search: async () => {
+    const code = get().input.trim()
+    const invalid = validateTrackingCode(code)
+    if (invalid) {
+      set({ status: 'error', error: invalid, data: null })
+      return
+    }
+    set({ status: 'loading', error: null })
+    try {
+      const data = await fetchTracking(code)
+      set({ status: 'success', data })
+    } catch (e) {
+      set({ status: 'error', error: e instanceof Error ? e.message : 'Internal server error.', data: null })
+    }
   },
-  select: (tracking) => set({ input: tracking, tracked: tracking }),
+  select: async (trackingCode) => {
+    set({ input: trackingCode })
+    await get().search()
+  },
 }))
